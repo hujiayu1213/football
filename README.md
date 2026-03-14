@@ -1,301 +1,121 @@
-[scikit-learn]: <http://scikit-learn.org/stable/>
-[black badge]: <https://img.shields.io/badge/%20style-black-000000.svg>
-[black]: <https://github.com/psf/black>
-[docformatter badge]: <https://img.shields.io/badge/%20formatter-docformatter-fedcba.svg>
-[docformatter]: <https://github.com/PyCQA/docformatter>
-[ruff badge]: <https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v1.json>
-[ruff]: <https://github.com/charliermarsh/ruff>
-[mypy badge]: <http://www.mypy-lang.org/static/mypy_badge.svg>
-[mypy]: <http://mypy-lang.org>
-[mkdocs badge]: <https://img.shields.io/badge/docs-mkdocs%20material-blue.svg?style=flat>
-[mkdocs]: <https://squidfunk.github.io/mkdocs-material>
-[version badge]: <https://img.shields.io/pypi/v/sports-betting.svg>
-[pythonversion badge]: <https://img.shields.io/pypi/pyversions/sports-betting.svg>
-[downloads badge]: <https://img.shields.io/pypi/dd/sports-betting>
-[gitter]: <https://gitter.im/sports-betting/community>
-[gitter badge]: <https://badges.gitter.im/join%20chat.svg>
-[discussions]: <https://github.com/georgedouzas/sports-betting/discussions>
-[discussions badge]: <https://img.shields.io/github/discussions/georgedouzas/sports-betting>
-[ci]: <https://github.com/georgedouzas/sports-betting/actions?query=workflow>
-[ci badge]: <https://github.com/georgedouzas/sports-betting/actions/workflows/ci.yml/badge.svg?branch=main>
-[doc]: <https://github.com/georgedouzas/sports-betting/actions?query=workflow>
-[doc badge]: <https://github.com/georgedouzas/sports-betting/actions/workflows/doc.yml/badge.svg?branch=main>
+# sports-betting（实习项目版）
 
-# sports-betting
+> 一个用于体育数据建模与投注策略评估的 Python 项目，提供 API、CLI 和 GUI 三种使用方式。
 
-[![ci][ci badge]][ci] [![doc][doc badge]][doc]
+## 项目简介
 
-| Category          | Tools    |
-| ------------------| -------- |
-| **Development**   | [![black][black badge]][black] [![ruff][ruff badge]][ruff] [![mypy][mypy badge]][mypy] [![docformatter][docformatter badge]][docformatter] |
-| **Package**       | ![version][version badge] ![pythonversion][pythonversion badge] ![downloads][downloads badge] |
-| **Documentation** | [![mkdocs][mkdocs badge]][mkdocs]|
-| **Communication** | [![gitter][gitter badge]][gitter] [![discussions][discussions badge]][discussions] |
+这个项目的目标是把“体育比赛数据 -> 模型训练 -> 策略回测 -> 价值投注预测”串成一条完整流程，帮助用户用工程化方式验证投注策略，而不是靠主观判断下单。
 
-## Introduction
+从实习经历角度，你可以把它理解为：
 
-The `sports-betting package` is a handy set of tools for creating, testing, and using sports betting models. It comes
-with a Python API, a CLI, and even a GUI built with [Reflex](https://reflex.dev/) to keep things simple:
+- 我参与了一个数据驱动的策略评估系统。
+- 我负责把数据处理与模型评估流程产品化（命令行/图形界面）。
+- 我把机器学习输出转化为可解释的业务指标（如收益率、ROI、最终资金）。
 
-![](screenshots/predictions.png)
-![](docs/screenshots/predictions.png)
+## 两大核心功能（建议你重点包装）
 
-The main components of `sports-betting` are dataloaders and bettors objects:
+### 1) 数据加载与特征构建（Data Pipeline）
 
-- Dataloaders download and prepare data suitable for predictive modelling.
-- Bettors provide an easy way to backtest betting strategies and predict the value bets of future events.
+核心能力：通过 `SoccerDataLoader` 自动完成训练数据与赛程数据的提取与标准化。
 
-## Quick start
+你可以这样描述你的价值：
 
-### GUI
+- 支持按联赛、年份、级别等参数灵活筛选数据。
+- 统一训练集与赛程集的数据结构，保证训练/推理流程一致。
+- 支持多种赔率类型，并对缺失值进行阈值控制，提升数据质量。
 
-`sports-betting` comes with a GUI that provides a intuitive way to interact with the library. It supports the following
-functionalitites:
+对应模块：
 
-- Easily upload, create, or update dataloaders to handle historical and fixtures data.
-- Develop and test betting models with tools for backtesting and identifying value bets.
+- `src/sportsbet/datasets/`
+- `src/sportsbet/cli/_data.py`
 
-To launch the GUI, simply run the command `sportsbet-gui`. Once started, you’ll see the initial screen:
+---
 
-![](screenshots/initial.png)
-![](docs/screenshots/initial.png)
+### 2) 策略建模与回测评估（Model + Backtesting）
 
-Explore the functionality with guidance from the built-in bot, which streams helpful messages along the way.
+核心能力：支持多种投注器（规则法/分类器）并提供可量化的回测评估结果。
 
-### API
+你可以这样描述你的价值：
 
-The `sports-betting` package makes it easy to download sports betting data:
+- 支持赔率比较策略与机器学习策略（如逻辑回归、梯度提升）。
+- 支持时间序列交叉验证，避免数据泄漏。
+- 输出可解释指标：每注收益率、ROI、最终资金、各市场下注次数等。
+- 可在赛程数据上预测价值投注，用于实际策略决策。
 
-```python
-from sportsbet.datasets import SoccerDataLoader
-dataloader = SoccerDataLoader(param_grid={'league': ['Italy'], 'year': [2020]})
-X_train, Y_train, O_train = dataloader.extract_train_data(odds_type='market_maximum')
-X_fix, Y_fix, O_fix = dataloader.extract_fixtures_data()
-```
+对应模块：
 
-`X_train` are the historical/training data and `X_fix` are the test/fixtures data. The historical data can be used to backtest the
-performance of a bettor model:
+- `src/sportsbet/evaluation/`
+- `src/sportsbet/cli/_betting.py`
 
-```python
-from sportsbet.evaluation import ClassifierBettor, backtest
-from sklearn.dummy import DummyClassifier
-bettor = ClassifierBettor(DummyClassifier())
-backtest(bettor, X_train, Y_train, O_train)
-```
+## 项目交付形态
 
-We can use the trained bettor model to predict the value bets using the fixtures data:
+- Python API：便于二次开发和实验。
+- CLI：便于批处理和自动化执行。
+- GUI：便于非技术同学或业务侧快速使用。
 
-```python
-bettor.fit(X_train, Y_train)
-bettor.bet(X_fix, O_fix)
-```
+## 技术栈
 
-## Sports betting in practice
+- Python 3.11/3.12
+- pandas / scikit-learn / aiohttp / click / rich
+- Reflex（GUI）
 
-You can think of any sports betting event as a random experiment with unknown probabilities for the various outcomes. Even for the
-most unlikely outcome, for example scoring more than 10 goals in a soccer match, a small probability is still assigned. The
-bookmaker estimates this probability P and offers the corresponding odds O. In theory, if the bookmaker offers the so-called fair
-odds O = 1 / P in the long run, neither the bettor nor the bookmaker would make any money.
+## 实习面试可讲故事线（可直接复用）
 
-The bookmaker's strategy is to adjust the odds in their favor using the over-round of probabilities. In practice, it offers odds
-less than the estimated fair odds. The important point here is that the bookmaker still has to estimate the probabilities of
-outcomes and provide odds that guarantee them long-term profit.
+1. 业务问题：如何用数据方法系统评估投注策略，而不是凭经验下注。  
+2. 我的方案：搭建“数据加载 + 模型训练 + 回测评估 + 预测输出”的端到端流程。  
+3. 工程实现：把能力封装成 API/CLI/GUI，降低使用门槛。  
+4. 结果指标：能稳定输出 ROI、收益率、最终资金等可量化结果，支持策略对比。  
+5. 反思优化：关注时间序列验证、缺失值处理、特征一致性与可解释性。
 
-On the other hand, the bettor can also estimate the probabilities and compare them to the odds the bookmaker offers. If the
-estimated probability of an outcome is higher than the implied probability from the provided odds, then the bet is called a value
-bet.
+## 快速开始
 
-The only long-term betting strategy that makes sense is to select value bets. However, you have to remember that neither the
-bettor nor the bookmaker can access the actual probabilities of outcomes. Therefore, identifying a value bet from the side of the
-bettor is still an estimation. The bettor or the bookmaker might be wrong, or both of them.
-
-Another essential point is that bookmakers can access resources that the typical bettor is rare to access. For instance, they have
-more data, computational power, and teams of experts working on predictive models. You may assume that trying to beat them is
-pointless, but this is not necessarily correct. The bookmakers have multiple factors to consider when they offer their adjusted
-odds. This is the reason there is a considerable variation among the offered odds. The bettor should aim to systematically
-estimate the value bets, backtest their performance, and not create arbitrarily accurate predictive models. This is a realistic
-goal, and `sports-betting` can help by providing appropriate tools.
-
-## Installation
-
-For user installation, `sports-betting` is currently available on the PyPi's repository, and you can install it via `pip`:
+### 1) 安装
 
 ```bash
-pip install sports_betting
+pip install -e .
 ```
 
-If you have Node.js version v22.0.0 or higher, you can optionally install the GUI:
+如需 GUI：
 
 ```bash
-pip install sports_betting[gui]
+pip install -e ".[gui]"
 ```
 
-Development installation requires to clone the repository and then use [PDM](https://github.com/pdm-project/pdm) to install the
-project as well as the main and development dependencies:
+### 2) CLI 示例
+
+查看命令：
 
 ```bash
-git clone https://github.com/georgedouzas/sports-betting.git
-cd sports-betting
-pdm install
+sportsbet --help
+sportsbet dataloader --help
+sportsbet bettor --help
 ```
 
-## Usage
-
-You can access `sports-betting` through the GUI application, the Python API, or the CLI. However, it’s a good idea to
-get familiar with the Python API since you’ll need it to create configuration files for the CLI or load custom betting
-models into the GUI. `sports-betting` supports all common sports betting needs i.e. fetching historical and fixtures
-data as well as backtesting of betting strategies and prediction of value bets. 
-
-## GUI
-
-Launch the GUI app with the command `sportsbet-gui`.
-
-Here are a few things you can do with the GUI:
-
-- Configure the dataloader:
-
-![](screenshots/parameters.png)
-![](docs/screenshots/parameters.png)
-
-- Create a new betting model:
-
-![](screenshots/betting_model.png)
-![](docs/screenshots/betting_model.png)
-
-- Run the model to get either backtesting results or value bets:
-
-![](screenshots/backtesting.png)
-![](docs/screenshots/backtesting.png)
-
-### API
-
-Assume we would like to backtest the following scenario and use the bettor object
-to predict value bets:
-
-- Selection of data
-  - First and second division of German, Italian and French leagues for the years 2021-2024
-  - Maximum odds of the market in order to backtest our betting strategy
-- Configuration of betting strategy
-  - 5-fold time ordered cross-validation
-  - Initial cash of 10000 euros
-  - Stake of 50 euros for each bet
-  - Use match odds (home win, away win and draw) as betting markets
-  - Logistic regression classifier to predict probabilities and value bets
-
-```python
-# Selection of data
-from sportsbet.datasets import SoccerDataLoader
-
-leagues = ['Germany', 'Italy', 'France']
-divisions = [1, 2]
-years = [2021, 2022, 2023, 2024]
-odds_type = 'market_maximum'
-dataloader = SoccerDataLoader({'league': leagues, 'year': years, 'division': divisions})
-X_train, Y_train, O_train = dataloader.extract_train_data(odds_type=odds_type)
-X_fix, _, O_fix = dataloader.extract_fixtures_data()
-
-# Configuration of betting strategy
-from sklearn.model_selection import TimeSeriesSplit
-from sklearn.compose import make_column_transformer
-from sklearn.linear_model import LogisticRegression
-from sklearn.impute import SimpleImputer
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.multioutput import MultiOutputClassifier
-from sportsbet.evaluation import ClassifierBettor, backtest
-
-tscv = TimeSeriesSplit(5)
-init_cash = 10000.0
-stake = 50.0
-betting_markets = ['home_win__full_time_goals', 'draw__full_time_goals', 'away_win__full_time_goals']
-classifier = make_pipeline(
-  make_column_transformer(
-    (OneHotEncoder(handle_unknown='ignore'), ['league', 'home_team', 'away_team']), remainder='passthrough'
-  ),
-  SimpleImputer(),
-  MultiOutputClassifier(LogisticRegression(solver='liblinear', random_state=7, class_weight='balanced', C=50)),
-)
-bettor = ClassifierBettor(classifier, betting_markets=betting_markets, stake=stake, init_cash=init_cash)
-
-# Apply backtesting and get results
-backtesting_results = backtest(bettor, X_train, Y_train, O_train, cv=tscv)
-
-# Get value bets for upcoming betting events
-bettor.fit(X_train, Y_train)
-bettor.bet(X_fix, O_fix)
-```
-
-### CLI
-
-The command `sportsbet` provides various sub-commands to download data and predict the value bets. For any sub-command you may
-add the `--help` flag to get more information about its usage.
-
-#### Configuration
-
-In order to use the commands, a configuration file is required. You can find examples of such configuration files in
-`sports-betting/configs/`. The configuration file should have a Python file extension and contain a few variables. The variables 
-`DATALOADER_CLASS` and `PARAM_GRID` are mandatory while the rest are optional.
-
-The following variables configure the data extraction:
-
-- `DATALOADER_CLASS`: The dataloader class to use.
-
-- `PARAM_GRID`: The parameters grid to select the type of information that the data includes.
-
-- `DROP_NA_THRES`: The parameter `drop_na_thres` of the dataloader's `extract_train_data`.
-
-- `ODDS_TYPE`: The parameter `odds_type` of the dataloader's `extract_train_data`.
-
-The following variables configure the betting process:
-
-- `BETTOR`: A bettor object.
-
-- `CV`: The parameter `cv` of the function `backtest`.
-
-- `N_JOBS`: The parameter `n_jobs` of the function `backtest`.
-
-- `VERBOSE`: The parameter `verbose` of the function `backtest`.
-
-#### Commands
-
-Once these variables are provided, we can select the appropriate commands to select any of the `sports-betting`'s functionalities.
-
-##### Dataloader
-
-Show available parameters for dataloaders:
+### 3) GUI 启动
 
 ```bash
-sportsbet dataloader params -c config.py
+sportsbet-gui
 ```
 
-Show available odds types:
+## 项目结构速览
 
-```bash
-sportsbet dataloader odds-types -c config.py
+```text
+src/sportsbet/
+  datasets/      # 数据加载与清洗
+  evaluation/    # 策略建模、回测与评估
+  cli/           # 命令行入口
+  gui/           # 图形化界面
 ```
 
-Extract training data and save them as CSV files:
+## 简历描述模板（可直接改）
 
-```bash
-sportsbet dataloader training -c config.py -d /path/to/directory
-```
+- 负责体育投注策略评估项目的核心流程搭建，完成数据加载、模型训练、回测评估与价值投注预测闭环。  
+- 基于时间序列交叉验证设计回测方案，输出 ROI/收益率/最终资金等关键业务指标。  
+- 推动项目产品化落地，提供 API、CLI、GUI 三种使用方式，提升策略验证效率与可用性。
 
-Extract fixtures data and save them as CSV files:
+## 说明
 
-```bash
-sportsbet dataloader fixtures -c config.py -d /path/to/directory
-```
+本仓库原始项目来自开源社区。若用于实习/求职展示，建议明确标注：
 
-##### Bettor
-
-Backtest the bettor and save the results as CSV file:
-
-```bash
-sportsbet bettor backtest -c config.py -d /path/to/directory
-```
-
-Get the value bets and save them as CSV file:
-
-```bash
-sportsbet bettor bet -c config.py -d /path/to/directory
-```
+- 基于开源项目进行学习、复现与二次开发；
+- 重点说明你本人完成的具体改动与结果。

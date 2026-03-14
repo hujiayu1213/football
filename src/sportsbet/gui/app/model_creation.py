@@ -12,10 +12,10 @@ from .states import ModelCreationState
 def model(state: rx.State) -> rx.Component:
     """The model component."""
     return rx.vstack(
-        title('Model', 'wand'),
-        rx.text('Select a model', size='1'),
+        title('模型', 'wand'),
+        rx.text('请选择模型', size='1'),
         rx.select(
-            items=['Odds Comparison', 'Logistic Regression', 'Gradient Boosting'],
+            items=['赔率比较', '逻辑回归', '梯度提升'],
             value=state.model_selection,
             disabled=state.visibility_level > VL['model'],
             on_change=state.set_model_selection,
@@ -30,10 +30,10 @@ def run(state: rx.State) -> rx.Component:
     return rx.cond(
         state.visibility_level > VL['dataloader'],
         rx.vstack(
-            title('Run', 'play'),
-            rx.text('Run the model', size='1'),
+            title('运行', 'play'),
+            rx.text('运行模型', size='1'),
             rx.select(
-                items=['Backtesting', 'Value bets'],
+                items=['回测', '价值投注'],
                 value=state.evaluation_selection,
                 disabled=state.visibility_level > VL['evaluation'],
                 on_change=state.set_evaluation_selection,
@@ -51,7 +51,7 @@ def model_creation_page() -> rx.Component:
         navbar(),
         rx.hstack(
             sidebar(
-                mode(ModelCreationState, 'Create a model'),
+                mode(ModelCreationState, '创建模型'),
                 model(ModelCreationState),
                 dataloader(ModelCreationState, VL['model']),
                 run(ModelCreationState),

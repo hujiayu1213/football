@@ -13,11 +13,11 @@ from .states import DataloaderCreationState
 def sport(state: rx.State) -> rx.Component:
     """The sport component."""
     return rx.vstack(
-        title('Sport', 'medal'),
-        rx.text('Select a sport', size='1'),
+        title('运动项目', 'medal'),
+        rx.text('请选择运动项目', size='1'),
         rx.select(
-            items=['Soccer'],
-            value='Soccer',
+            items=['足球'],
+            value='足球',
             disabled=state.visibility_level > VL['sport'],
             on_change=state.set_sport_selection,
         ),
@@ -71,13 +71,13 @@ def parameters(state: rx.State) -> rx.Component:
                 rx.form.root(
                     rx.dialog.title(name),
                     rx.dialog.description(
-                        f'Select the {name.lower()} to include in the training data.',
+                        f'选择需要包含在训练数据中的{name}。',
                         size="2",
                         margin_bottom="16px",
                     ),
                     rx.hstack(rx.foreach(rows, lambda row: _checkboxes(row, state))),
                     rx.flex(
-                        rx.dialog.close(rx.button('Submit', type='submit')),
+                        rx.dialog.close(rx.button('提交', type='submit')),
                         justify='end',
                         spacing="3",
                         margin_top="50px",
@@ -92,24 +92,24 @@ def parameters(state: rx.State) -> rx.Component:
     return rx.cond(
         state.visibility_level > VL['sport'],
         rx.vstack(
-            title('Parameters', 'proportions'),
-            rx.text('Select parameters', size='1'),
+            title('参数', 'proportions'),
+            rx.text('请选择参数', size='1'),
             rx.hstack(
-                _dialog('Leagues', 'earth', state.all_leagues, state.handle_submit_leagues),
-                _dialog('Years', 'calendar', state.all_years, state.handle_submit_years),
-                _dialog('Divisions', 'gauge', state.all_divisions, state.handle_submit_divisions),
+                _dialog('联赛', 'earth', state.all_leagues, state.handle_submit_leagues),
+                _dialog('年份', 'calendar', state.all_years, state.handle_submit_years),
+                _dialog('级别', 'gauge', state.all_divisions, state.handle_submit_divisions),
             ),
             rx.cond(
                 ~cast(rx.Var, DataloaderCreationState).leagues.bool(),
-                rx.text('Leagues are empty. Please select at least one.', size='1'),
+                rx.text('联赛为空，请至少选择一项。', size='1'),
             ),
             rx.cond(
                 ~cast(rx.Var, DataloaderCreationState).years.bool(),
-                rx.text('Years are empty. Please select at least one.', size='1'),
+                rx.text('年份为空，请至少选择一项。', size='1'),
             ),
             rx.cond(
                 ~cast(rx.Var, DataloaderCreationState).divisions.bool(),
-                rx.text('Divisions are empty. Please select at least one.', size='1'),
+                rx.text('级别为空，请至少选择一项。', size='1'),
             ),
         ),
     )
@@ -121,7 +121,7 @@ def training_parameters(state: rx.State) -> rx.Component:
         DataloaderCreationState.visibility_level > VL['parameters'],
         rx.vstack(
             rx.vstack(
-                rx.text('Odds type', size='1'),
+                rx.text('赔率类型', size='1'),
                 rx.select(
                     state.odds_types,
                     default_value=state.odds_types[0],
@@ -130,7 +130,7 @@ def training_parameters(state: rx.State) -> rx.Component:
                 ),
             ),
             rx.vstack(
-                rx.text(f'Drop NA threshold of columns: {DataloaderCreationState.drop_na_thres}', size='1'),
+                rx.text(f'列缺失值剔除阈值: {DataloaderCreationState.drop_na_thres}', size='1'),
                 rx.slider(
                     min=0.0,
                     max=1.0,
@@ -151,7 +151,7 @@ def dataloader_creation_page() -> rx.Component:
         navbar(),
         rx.hstack(
             sidebar(
-                mode(DataloaderCreationState, 'Create a dataloader'),
+                mode(DataloaderCreationState, '创建数据加载器'),
                 sport(DataloaderCreationState),
                 parameters(DataloaderCreationState),
                 training_parameters(DataloaderCreationState),

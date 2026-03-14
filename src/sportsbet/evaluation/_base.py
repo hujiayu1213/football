@@ -66,10 +66,10 @@ class BaseBettor(MultiOutputMixin, ClassifierMixin, BaseEstimator, metaclass=ABC
         elif not isinstance(self.betting_markets, list) or (
             isinstance(self.betting_markets, list) and not self.betting_markets
         ):
-            error_msg = 'Parameter `betting_markets` should be a list of betting market names.'
+            error_msg = '参数 `betting_markets` 应为投注市场名称列表。'
             raise TypeError(error_msg)
         elif isinstance(self.betting_markets, list) and not set(self.betting_markets).issubset(Y_betting_markets):
-            error_msg = 'Parameter `betting_markets` does not contain valid names.'
+            error_msg = '参数 `betting_markets` 包含无效名称。'
             raise ValueError(error_msg)
         else:
             self.betting_markets_ = np.array(self.betting_markets)
@@ -113,7 +113,7 @@ class BaseBettor(MultiOutputMixin, ClassifierMixin, BaseEstimator, metaclass=ABC
         try:
             check_is_fitted(self)
         except NotFittedError as nfe:
-            error_msg = f"'{self.__class__.__name__}' object has no attribute 'classes_'"
+            error_msg = f"'{self.__class__.__name__}' 对象没有属性 'classes_'"
             raise AttributeError(error_msg) from nfe
         return [np.array([0, 1]) for _ in enumerate(self.betting_markets_)]
 
@@ -128,24 +128,24 @@ class BaseBettor(MultiOutputMixin, ClassifierMixin, BaseEstimator, metaclass=ABC
 
         # Check data type
         if not isinstance(X, pd.DataFrame) or not isinstance(X.index, pd.DatetimeIndex):
-            error_msg = 'Input data `X` should be pandas dataframe with a date index.'
+            error_msg = '输入数据 `X` 应为带日期索引的 pandas DataFrame。'
             raise TypeError(error_msg)
         if not isinstance(Y, pd.DataFrame):
-            error_msg = 'Output data `Y` should be pandas dataframe.'
+            error_msg = '输出数据 `Y` 应为 pandas DataFrame。'
             raise TypeError(error_msg)
 
         # Check Y columns
         Y_cols = [col.split('__') for col in Y.columns]
         error_msg = (
-            "Output data column names should follow a naming "
-            "convention of the form `f'output__{betting_market_prefix}__{betting_market_target}'`"
+            "输出数据列名应遵循命名规范："
+            "`f'output__{betting_market_prefix}__{betting_market_target}'`"
         )
         if {len(tokens) for tokens in Y_cols} != {3}:
             raise ValueError(error_msg)
         Y_prefix, *Y_betting_markets_tokens = zip(*Y_cols, strict=True)
         Y_betting_markets = ['__'.join(tokens) for tokens in zip(*Y_betting_markets_tokens, strict=True)]
         if set(Y_prefix) != {'output'}:
-            error_msg = 'Prefixes of output data column names should be equal to `output`.'
+            error_msg = '输出数据列名前缀必须为 `output`。'
             raise ValueError(error_msg)
 
         return X, Y, Y_betting_markets
@@ -161,26 +161,26 @@ class BaseBettor(MultiOutputMixin, ClassifierMixin, BaseEstimator, metaclass=ABC
 
         # Check data type
         if not isinstance(X, pd.DataFrame) or not isinstance(X.index, pd.DatetimeIndex):
-            error_msg = 'Input data `X` should be pandas dataframe with a date index.'
+            error_msg = '输入数据 `X` 应为带日期索引的 pandas DataFrame。'
             raise TypeError(error_msg)
         if not isinstance(O, pd.DataFrame):
-            error_msg = 'Odds data `O` should be pandas dataframe.'
+            error_msg = '赔率数据 `O` 应为 pandas DataFrame。'
             raise TypeError(error_msg)
 
         # Check O columns
         O_cols = [col.split('__') for col in O.columns]
         error_msg = (
-            "Odds data column names should follow a naming "
-            "convention of the form `f'odds__{bookmaker}__{betting_market_prefix}__{betting_market_target}'`"
+            "赔率数据列名应遵循命名规范："
+            "`f'odds__{bookmaker}__{betting_market_prefix}__{betting_market_target}'`"
         )
         if {len(tokens) for tokens in O_cols} != {4}:
             raise ValueError(error_msg)
         O_prefix, O_bookmakers, *O_betting_markets_tokens = zip(*O_cols, strict=True)
         if set(O_prefix) != {'odds'}:
-            error_msg = 'Prefixes of odds data column names should be equal to `odds`.'
+            error_msg = '赔率数据列名前缀必须为 `odds`。'
             raise ValueError(error_msg)
         if len(set(O_bookmakers)) != 1:
-            error_msg = 'Bookmakers of odds data column names should be unique.'
+            error_msg = '赔率数据列名中的博彩公司标识必须唯一。'
             raise ValueError(error_msg)
         O_betting_markets = ['__'.join(tokens) for tokens in zip(*O_betting_markets_tokens, strict=True)]
 
@@ -224,7 +224,7 @@ class BaseBettor(MultiOutputMixin, ClassifierMixin, BaseEstimator, metaclass=ABC
         if O is not None:
             X, O, O_betting_markets = self._validate_X_O(X, O)
             if Y_betting_markets != O_betting_markets:
-                error_msg = 'Output and odds data column names are not compatible.'
+                error_msg = '输出数据与赔率数据列名不兼容。'
                 raise ValueError(error_msg)
         self._check(X, Y, O, Y_betting_markets)
         return self._fit(X, Y[self.feature_names_out_], O[self.feature_names_odds_] if O is not None else None)
@@ -247,7 +247,7 @@ class BaseBettor(MultiOutputMixin, ClassifierMixin, BaseEstimator, metaclass=ABC
         Y_proba_pred = self._predict_proba(X)
         Y_proba_pred = Y_proba_pred.reshape(Y_proba_pred.shape[0], -1)
         if Y_proba_pred.shape[1] != self.betting_markets_.size:
-            error_msg = 'Predicted probabilities and selected betting markets have incompatible shapes.'
+            error_msg = '预测概率与所选投注市场维度不兼容。'
             raise TypeError(error_msg)
         Y_proba_pred = self._normalize_proba(Y_proba_pred)
         return Y_proba_pred
@@ -284,7 +284,7 @@ class BaseBettor(MultiOutputMixin, ClassifierMixin, BaseEstimator, metaclass=ABC
         Y_proba_pred = self.predict_proba(X)
         X, O, O_betting_markets = self._validate_X_O(X, O)
         if not set(O_betting_markets).issuperset(self.betting_markets_):
-            error_msg = 'Odds data do not include selected betting markets.'
+            error_msg = '赔率数据未包含所选投注市场。'
             raise ValueError(error_msg)
         O = O[self._get_feature_names_odds(O)]
         B_pred = Y_proba_pred * O > 1

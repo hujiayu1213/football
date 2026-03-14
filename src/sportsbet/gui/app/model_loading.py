@@ -25,10 +25,10 @@ def run(state: rx.State) -> rx.Component:
     return rx.cond(
         state.visibility_level > VL['dataloader_model'],
         rx.vstack(
-            title('Run', 'play'),
-            rx.text('Run the model', size='1'),
+            title('运行', 'play'),
+            rx.text('运行模型', size='1'),
             rx.select(
-                items=['Backtesting', 'Value bets'],
+                items=['回测', '价值投注'],
                 value=state.evaluation_selection,
                 disabled=state.visibility_level > VL['evaluation'],
                 on_change=state.set_evaluation_selection,
@@ -46,7 +46,7 @@ def model_loading_page() -> rx.Component:
         navbar(),
         rx.hstack(
             sidebar(
-                mode(ModelLoadingState, 'Load a model'),
+                mode(ModelLoadingState, '加载模型'),
                 dataloader(ModelLoadingState, 1),
                 model(ModelLoadingState, 1),
                 run(ModelLoadingState),

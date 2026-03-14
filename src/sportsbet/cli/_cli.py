@@ -13,10 +13,9 @@ from ._data import dataloader
 
 @click.group()
 def main() -> None:
-    """CLI for sports-betting.
+    """sports-betting 的命令行工具。
 
-    This command is executed when you type `sportsbet` or `python -m
-    sportsbet`.
+    当你输入 `sportsbet` 或 `python -m sportsbet` 时会执行该命令。
     """
     return
 

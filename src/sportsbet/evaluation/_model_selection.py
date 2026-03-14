@@ -132,13 +132,13 @@ def backtest(
     # Check data
     check_consistent_length(X, Y, O)
     if not isinstance(X, pd.DataFrame) or not isinstance(X.index, pd.DatetimeIndex):
-        error_msg = 'Input data `X` should be pandas dataframe with a date index.'
+        error_msg = '输入数据 `X` 应为带日期索引的 pandas DataFrame。'
         raise TypeError(error_msg)
     if not isinstance(Y, pd.DataFrame):
-        error_msg = 'Output data `Y` should be pandas dataframe.'
+        error_msg = '输出数据 `Y` 应为 pandas DataFrame。'
         raise TypeError(error_msg)
     if not isinstance(O, pd.DataFrame):
-        error_msg = 'Odds data `O` should be pandas dataframe.'
+        error_msg = '赔率数据 `O` 应为 pandas DataFrame。'
         raise TypeError(error_msg)
 
     # Sort data
@@ -149,7 +149,7 @@ def backtest(
     if cv is None:
         cv = TimeSeriesSplit()
     if not isinstance(cv, TimeSeriesSplit):
-        error_msg = 'Parameter `cv` should be a TimeSeriesSplit cross-validator object.'
+        error_msg = '参数 `cv` 应为 TimeSeriesSplit 交叉验证器对象。'
         raise TypeError(error_msg)
 
     # Calculate results
@@ -396,12 +396,12 @@ class BettorGridSearchCV(GridSearchCV, BaseBettor):
             try:
                 check_is_fitted(self)
             except NotFittedError as nfe:
-                error_msg = f"'{self.__class__.__name__}' object has no attribute '{attr_name}'"
+                error_msg = f"'{self.__class__.__name__}' 对象没有属性 '{attr_name}'"
                 raise AttributeError(error_msg) from nfe
         else:
             check_is_fitted(self)
         if check_best_estimator and not hasattr(self, 'best_estimator_'):
-            error_msg = f"'{self.__class__.__name__}' object has no attribute '{attr_name}'"
+            error_msg = f"'{self.__class__.__name__}' 对象没有属性 '{attr_name}'"
             raise AttributeError(error_msg)
 
     def modify_scorer(self: Self, scorer: Callable) -> Callable:
@@ -419,10 +419,10 @@ class BettorGridSearchCV(GridSearchCV, BaseBettor):
 
     def _fit(self: Self, X: pd.DataFrame, Y: pd.DataFrame, O: pd.DataFrame | None) -> Self:
         if not isinstance(self.estimator, BaseBettor):
-            error_msg = f'`BettorGridSearchCV` requires a bettor as estimator. Instead {type(self.estimator)} is given.'
+            error_msg = f'`BettorGridSearchCV` 需要投注器作为估计器，当前传入的是 {type(self.estimator)}。'
             raise TypeError(error_msg)
         if not isinstance(self.cv, TimeSeriesSplit):
-            error_msg = 'Parameter `cv` should be a TimeSeriesSplit cross-validator object.'
+            error_msg = '参数 `cv` 应为 TimeSeriesSplit 交叉验证器对象。'
             raise TypeError(error_msg)
         initial_scoring = deepcopy(self.scoring)
         if O is not None and initial_scoring is None:
@@ -435,8 +435,8 @@ class BettorGridSearchCV(GridSearchCV, BaseBettor):
         else:
             if initial_scoring is None:
                 error_msg = (
-                    'The default scoring method requires the odds data `O` to be provided. '
-                    'Invoke the fit method as `object.fit(X, Y, O)`.'
+                    '默认评分方式要求提供赔率数据 `O`。'
+                    '请按 `object.fit(X, Y, O)` 调用 fit 方法。'
                 )
                 raise TypeError(error_msg)
             scorers, _ = self._get_scorers()

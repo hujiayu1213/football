@@ -20,7 +20,7 @@ def get_data_path_option() -> Callable[[FC], FC]:
         required=False,
         default=None,
         type=str,
-        help='The path to save the artifacts of betting CLI.',
+        help='用于保存命令行产物的路径。',
     )
 
 
@@ -32,5 +32,5 @@ def get_config_path_option() -> Callable[[FC], FC]:
         nargs=1,
         required=True,
         type=str,
-        help='The path of the configuration file.',
+        help='配置文件路径。',
     )

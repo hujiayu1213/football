@@ -37,10 +37,10 @@ BETTING_MARKETS = [
     ['home_win__full_time_goals', 'away_win__full_time_goals'],
 ]
 DATALOADERS = {
-    'Soccer': SoccerDataLoader,
+    '足球': SoccerDataLoader,
 }
 MODELS = {
-    'Odds Comparison': BettorGridSearchCV(
+    '赔率比较': BettorGridSearchCV(
         estimator=OddsComparisonBettor(),
         param_grid={
             'alpha': np.linspace(0.0, 0.05, 20),
@@ -48,7 +48,7 @@ MODELS = {
         },
         error_score='raise',
     ),
-    'Logistic Regression': BettorGridSearchCV(
+    '逻辑回归': BettorGridSearchCV(
         estimator=ClassifierBettor(
             classifier=make_pipeline(
                 make_column_transformer(
@@ -68,7 +68,7 @@ MODELS = {
         },
         error_score='raise',
     ),
-    'Gradient Boosting': BettorGridSearchCV(
+    '梯度提升': BettorGridSearchCV(
         estimator=ClassifierBettor(
             classifier=make_pipeline(
                 make_column_transformer(
@@ -142,8 +142,8 @@ class State(rx.State):
     loading: bool = False
 
     # Mode
-    mode_category: str = 'Data'
-    mode_type: str = 'Create'
+    mode_category: str = '数据'
+    mode_type: str = '新建'
 
     # Message
     streamed_message: str = ''
@@ -155,21 +155,20 @@ class State(rx.State):
 
     async def on_load(self: Self) -> AsyncGenerator:
         """Event on page load."""
-        message = """You can create or load a dataloader to grab historical and fixtures
-        data. Plus, you can create or load a betting model to test how it performs and find value bets for
-        upcoming games.
+        message = """你可以创建或加载数据加载器，用于获取历史数据和赛程数据。
+        你也可以创建或加载投注模型，评估模型表现并为即将开始的比赛识别价值投注。
         <br><br>
-        <strong>Data, Create</strong><br>
-        Create a new dataloader<br><br>
+        <strong>数据，新建</strong><br>
+        创建新的数据加载器<br><br>
 
-        <strong>Data, Load</strong><br>
-        Load an existing dataloader.<br><br>
+        <strong>数据，加载</strong><br>
+        加载已有数据加载器。<br><br>
 
-        <strong>Modelling, Create</strong><br>
-        Create a new beting model.<br><br>
+        <strong>建模，新建</strong><br>
+        创建新的投注模型。<br><br>
 
-        <strong>Modelling, Load</strong><br>
-        Load an existing betting model."""
+        <strong>建模，加载</strong><br>
+        加载已有投注模型。"""
         self.streamed_message = ''
         for char in message:
             await asyncio.sleep(DELAY)
@@ -198,8 +197,8 @@ class State(rx.State):
         self.loading: bool = False
 
         # Mode
-        self.mode_category = 'Data'
-        self.mode_type = 'Create'
+        self.mode_category = '数据'
+        self.mode_type = '新建'
 
         # Message
         self.streamed_message = ''
@@ -220,7 +219,7 @@ class DataloaderState(State):
 class DataloaderCreationState(DataloaderState):
     """The dataloader creation state."""
 
-    sport_selection: str = 'Soccer'
+    sport_selection: str = '足球'
     all_params: list[dict[str, Any]] = []  # noqa: RUF012
     leagues: list[str] = []  # noqa: RUF012
     years: list[int] = []  # noqa: RUF012
@@ -249,8 +248,7 @@ class DataloaderCreationState(DataloaderState):
 
     async def on_load(self: Self) -> AsyncGenerator:
         """Event on page load."""
-        message = """Begin by selecting your sport. Currently, only soccer is
-        available, but more sports will be added soon!"""
+        message = """请先选择运动项目。当前仅支持足球，后续会逐步增加更多项目。"""
         self.streamed_message = ''
         for char in message:
             await asyncio.sleep(DELAY)
@@ -276,13 +274,13 @@ class DataloaderCreationState(DataloaderState):
         if self.data in (self.X_train, self.Y_train, self.O_train):
             self.data = self.X_fix
             self.data_cols = self.X_fix_cols
-            self.data_title = 'Fixtures input data'
+            self.data_title = '赛程输入数据'
             self.loading_db = False
             yield
         elif self.data in (self.X_fix, self.O_fix):
             self.data = self.X_train
             self.data_cols = self.X_train_cols
-            self.data_title = 'Training input data'
+            self.data_title = '训练输入数据'
             self.loading_db = False
             yield
 
@@ -294,31 +292,31 @@ class DataloaderCreationState(DataloaderState):
         if self.data == self.X_train:
             self.data = self.Y_train
             self.data_cols = self.Y_train_cols
-            self.data_title = 'Training output data'
+            self.data_title = '训练输出数据'
             self.loading_db = False
             yield
         elif self.data == self.Y_train:
             self.data = self.O_train
             self.data_cols = self.O_train_cols
-            self.data_title = 'Training odds data'
+            self.data_title = '训练赔率数据'
             self.loading_db = False
             yield
         elif self.data == self.O_train:
             self.data = self.X_train
             self.data_cols = self.X_train_cols
-            self.data_title = 'Training input data'
+            self.data_title = '训练输入数据'
             self.loading_db = False
             yield
         elif self.data == self.X_fix:
             self.data = self.O_fix
             self.data_cols = self.O_fix_cols
-            self.data_title = 'Fixtures odds data'
+            self.data_title = '赛程赔率数据'
             self.loading_db = False
             yield
         elif self.data == self.O_fix:
             self.data = self.X_fix
             self.data_cols = self.X_fix_cols
-            self.data_title = 'Fixtures input data'
+            self.data_title = '赛程输入数据'
             self.loading_db = False
             yield
 
@@ -373,16 +371,14 @@ class DataloaderCreationState(DataloaderState):
             self.divisions = [int(division) for division in DEFAULT_PARAM_CHECKED['divisions']]
             self.loading = False
             yield
-            message = """You can configure the dataloader by selecting the type of training data to include. The
-            fixtures data follow the same schema, ensuring consistency for applying machine learning
-            models during training and inference.<br><br>
+            message = """你可以通过选择训练数据范围来配置数据加载器。
+            赛程数据会遵循与训练数据一致的字段结构，从而保证训练与推理阶段的一致性。<br><br>
 
-            <strong>Training data</strong><br>
-            Choose specific leagues, divisions, and years to include.<br><br>
+            <strong>训练数据</strong><br>
+            选择要纳入的联赛、级别和年份。<br><br>
 
-            <strong>Fixtures data</strong><br>
-            The selection of leagues, divisions, and years does not impact the fixtures data, which includes all
-            upcoming matches."""
+            <strong>赛程数据</strong><br>
+            联赛、级别和年份的选择不会影响赛程数据，赛程包含所有即将进行的比赛。"""
             self.streamed_message = ''
             for char in message:
                 await asyncio.sleep(DELAY)
@@ -394,17 +390,14 @@ class DataloaderCreationState(DataloaderState):
             self.odds_types = DATALOADERS[self.sport_selection](self.param_grid).get_odds_types()
             self.loading = False
             yield
-            message = """The training data consists of input, output, and odds, while the fixtures include only
-            input and odds.<br><br>
+            message = """训练数据包含输入、输出和赔率；赛程数据仅包含输入和赔率。<br><br>
 
-            <strong>Training data</strong><br>
-            You can choose the type of odds to use. Additionally, you can set a tolerance
-            level for missing values in the training data. Columns with missing values exceeding
-            this tolerance will be removed.<br><br>
+            <strong>训练数据</strong><br>
+            你可以选择要使用的赔率类型。
+            同时可以设置训练数据的缺失值容忍阈值，超过阈值的列将被移除。<br><br>
 
-            <strong>Fixtures data</strong><br>
-            The selections made for the training data affect the fixtures data because their schema aligns
-            with the schema of the training data."""
+            <strong>赛程数据</strong><br>
+            由于赛程数据与训练数据字段结构保持一致，训练阶段的选择会影响赛程数据。"""
             self.streamed_message = ''
             for char in message:
                 await asyncio.sleep(DELAY)
@@ -421,7 +414,7 @@ class DataloaderCreationState(DataloaderState):
             self.data_cols = self.X_train_cols = [ag_grid.column_def(field='date', header_name='Date')] + [
                 ag_grid.column_def(field=col, header_name=self.process_cols(col)) for col in X_train.columns
             ]
-            self.data_title = 'Training input data'
+            self.data_title = '训练输入数据'
             self.Y_train = Y_train.fillna('NA').to_dict('records')
             self.Y_train_cols = [
                 ag_grid.column_def(field=col, header_name=self.process_cols(col)) for col in Y_train.columns
@@ -459,33 +452,18 @@ class DataloaderCreationState(DataloaderState):
         self.loading: bool = False
 
         # Mode
-        self.mode_category = 'Data'
-        self.mode_type = 'Create'
+        self.mode_category = '数据'
+        self.mode_type = '新建'
 
         # Data
         self.dataloader_serialized = None
         self.dataloader_filename = None
-
-        # Sport
-        self.sport_selection = 'Soccer'
-        self.all_params = []
         self.all_leagues = []
         self.all_years = []
         self.all_divisions = []
-        self.leagues = []
-        self.years = []
-        self.divisions = []
-        self.params = []
-
-        # Parameters
         self.param_checked = {}
-        self.default_param_checked = DEFAULT_PARAM_CHECKED
-        self.odds_types = []
-        self.param_grid = []
-
-        # Training
-        self.odds_type = 'market_average'
-        self.drop_na_thres = [0.0]
+        self.odds_type = None
+        self.drop_na_thres = None
 
         # Data
         self.data = None
@@ -499,10 +477,8 @@ class DataloaderCreationState(DataloaderState):
         self.Y_train_cols = None
         self.O_train_cols = None
         self.X_fix = None
-        self.Y_fix = None
         self.O_fix = None
         self.X_fix_cols = None
-        self.Y_fix_cols = None
         self.O_fix_cols = None
 
         # Message
@@ -532,7 +508,7 @@ class DataloaderLoadingState(DataloaderState):
 
     async def on_load(self: Self) -> AsyncGenerator:
         """Event on page load."""
-        message = """Select a dataloader file to extract the latest training and fixtures data."""
+        message = """请选择数据加载器文件，以提取最新的训练数据和赛程数据。"""
         self.streamed_message = ''
         for char in message:
             await asyncio.sleep(DELAY)
@@ -553,7 +529,7 @@ class DataloaderLoadingState(DataloaderState):
         dataloader = cloudpickle.loads(bytes(cast(str, self.dataloader_serialized), 'iso8859_16'))
         if not isinstance(dataloader, BaseDataLoader):
             self.dataloader_error = True
-            message = """Uploaded file is not a dataloader. Please try again."""
+            message = """上传文件不是数据加载器，请重试。"""
             self.streamed_message = ''
             for char in message:
                 await asyncio.sleep(DELAY)
@@ -561,7 +537,7 @@ class DataloaderLoadingState(DataloaderState):
                 yield
         else:
             self.dataloader_error = False
-            message = """Uploaded file is a dataloader. You may proceed to the next step."""
+            message = """上传文件是有效的数据加载器，可以继续下一步。"""
             self.streamed_message = ''
             for char in message:
                 await asyncio.sleep(DELAY)
@@ -582,13 +558,13 @@ class DataloaderLoadingState(DataloaderState):
         if self.data in (self.X_train, self.Y_train, self.O_train):
             self.data = self.X_fix
             self.data_cols = self.X_fix_cols
-            self.data_title = 'Fixtures input data'
+            self.data_title = '赛程输入数据'
             self.loading_db = False
             yield
         elif self.data in (self.X_fix, self.O_fix):
             self.data = self.X_train
             self.data_cols = self.X_train_cols
-            self.data_title = 'Training input data'
+            self.data_title = '训练输入数据'
             self.loading_db = False
             yield
 
@@ -600,31 +576,31 @@ class DataloaderLoadingState(DataloaderState):
         if self.data == self.X_train:
             self.data = self.Y_train
             self.data_cols = self.Y_train_cols
-            self.data_title = 'Training output data'
+            self.data_title = '训练输出数据'
             self.loading_db = False
             yield
         elif self.data == self.Y_train:
             self.data = self.O_train
             self.data_cols = self.O_train_cols
-            self.data_title = 'Training odds data'
+            self.data_title = '训练赔率数据'
             self.loading_db = False
             yield
         elif self.data == self.O_train:
             self.data = self.X_train
             self.data_cols = self.X_train_cols
-            self.data_title = 'Training input data'
+            self.data_title = '训练输入数据'
             self.loading_db = False
             yield
         elif self.data == self.X_fix:
             self.data = self.O_fix
             self.data_cols = self.O_fix_cols
-            self.data_title = 'Fixtures odds data'
+            self.data_title = '赛程赔率数据'
             self.loading_db = False
             yield
         elif self.data == self.O_fix:
             self.data = self.X_fix
             self.data_cols = self.X_fix_cols
-            self.data_title = 'Fixtures input data'
+            self.data_title = '赛程输入数据'
             self.loading_db = False
             yield
 
@@ -647,7 +623,7 @@ class DataloaderLoadingState(DataloaderState):
             self.data_cols = self.X_train_cols = [ag_grid.column_def(field='date', header_name='Date')] + [
                 ag_grid.column_def(field=col, header_name=self.process_cols(col)) for col in X_train.columns
             ]
-            self.data_title = 'Training input data'
+            self.data_title = '训练输入数据'
             self.Y_train = Y_train.fillna('NA').to_dict('records')
             self.Y_train_cols = [
                 ag_grid.column_def(field=col, header_name=self.process_cols(col)) for col in Y_train.columns
@@ -695,22 +671,24 @@ class DataloaderLoadingState(DataloaderState):
         self.loading: bool = False
 
         # Mode
-        self.mode_category = 'Data'
-        self.mode_type = 'Create'
+        self.mode_category = '数据'
+        self.mode_type = '新建'
 
         # Data
         self.dataloader_serialized = None
         self.dataloader_filename = None
-        self.data = None
-        self.data_cols = None
-        self.data_title = None
-        self.loading_db = False
         self.all_leagues = []
         self.all_years = []
         self.all_divisions = []
         self.param_checked = {}
         self.odds_type = None
         self.drop_na_thres = None
+
+        # Data
+        self.data = None
+        self.data_cols = None
+        self.data_title = None
+        self.loading_db = False
         self.X_train = None
         self.Y_train = None
         self.O_train = None
@@ -729,12 +707,12 @@ class DataloaderLoadingState(DataloaderState):
 class ModelCreationState(State):
     """The model creation state."""
 
-    model_selection: str = 'Odds Comparison'
+    model_selection: str = '赔率比较'
     dataloader_serialized: str | None = None
     dataloader_filename: str | None = None
     model_serialized: str | None = None
     model_filename: str | None = None
-    evaluation_selection: str = 'Backtesting'
+    evaluation_selection: str = '回测'
     backtesting_results: list | None = None
     backtesting_results_cols: list | None = None
     optimal_params: list | None = None
@@ -744,18 +722,16 @@ class ModelCreationState(State):
 
     async def on_load(self: Self) -> AsyncGenerator:
         """Event on page load."""
-        message = """Begin by selecting a betting model. Currently, three options are available.<br><br>
+        message = """请先选择投注模型。当前提供三种模型。<br><br>
 
-        <strong>Odds Comparison Model</strong><br>
-        Calculates probabilities based on average odds and identifies value bets.<br><br>
+        <strong>赔率比较模型</strong><br>
+        基于平均赔率估计概率，并识别价值投注。<br><br>
 
-        <strong>Logistic Regression Model</strong><br>
-        Fits a logistic regression classifier to the training data with various
-        hyperparameters, managing both categorical and missing values.<br><br>
+        <strong>逻辑回归模型</strong><br>
+        在训练数据上拟合逻辑回归分类器，支持多组超参数，并处理类别特征和缺失值。<br><br>
 
-        <strong>Gradient Boosting Model</strong><br>
-        Fits a gradient boosting classifier to the training data with various
-        hyperparameters, also handling categorical and missing values."""
+        <strong>梯度提升模型</strong><br>
+        在训练数据上拟合梯度提升分类器，支持多组超参数，同样可处理类别特征和缺失值。"""
         self.streamed_message = ''
         for char in message:
             await asyncio.sleep(DELAY)
@@ -782,7 +758,7 @@ class ModelCreationState(State):
         dataloader = cloudpickle.loads(bytes(cast(str, self.dataloader_serialized), 'iso8859_16'))
         if not isinstance(dataloader, BaseDataLoader):
             self.dataloader_error = True
-            message = """Uploaded file is not a dataloader. Please try again."""
+            message = """上传文件不是数据加载器，请重试。"""
             self.streamed_message = ''
             for char in message:
                 await asyncio.sleep(DELAY)
@@ -790,7 +766,7 @@ class ModelCreationState(State):
                 yield
         else:
             self.dataloader_error = False
-            message = """Uploaded file is a dataloader. You may proceed to the next step."""
+            message = """上传文件是有效的数据加载器，可以继续下一步。"""
             self.streamed_message = ''
             for char in message:
                 await asyncio.sleep(DELAY)
@@ -806,7 +782,7 @@ class ModelCreationState(State):
             self.loading = False
             yield
             message = (
-                """Upload a dataloader to use with the model for backtesting its performance or finding value bets."""
+                """请上传数据加载器，以便对模型执行回测或识别价值投注。"""
             )
             self.streamed_message = ''
             for char in message:
@@ -816,14 +792,13 @@ class ModelCreationState(State):
         elif self.visibility_level == VISIBILITY_LEVELS_MODEL_CREATION['dataloader']:
             self.loading = False
             yield
-            message = """Choose whether to backtest the model or predict value bets.<br><br>
+            message = """请选择“回测”或“价值投注”运行方式。<br><br>
 
-            Backtesting uses 3-fold time ordered cross-validation with a constant betting
-            stake of 50 and an initial cash balance of 10000. After backtesting, the
-            model is fitted to the entire training set.<br><br>
+            回测使用 3 折时间序列交叉验证，单注固定为 50，初始资金为 10000。
+            回测结束后，模型会在全部训练集上重新拟合。<br><br>
 
-            The model can also predict value bets using the fixtures data. The model is fitted
-            to the entire training set before making predictions."""
+            价值投注模式会使用赛程数据进行预测。
+            预测前模型同样会在全部训练集上完成拟合。"""
             self.streamed_message = ''
             for char in message:
                 await asyncio.sleep(DELAY)
@@ -842,7 +817,7 @@ class ModelCreationState(State):
             model.fit(X_train, Y_train, O_train)
             self.model_serialized = str(cloudpickle.dumps(model), 'iso8859_16')
             self.model_filename = 'model.pkl'
-            if self.evaluation_selection == 'Backtesting':
+            if self.evaluation_selection == '回测':
                 backtesting_results = backtest(model, X_train, Y_train, O_train, cv=TimeSeriesSplit(3)).reset_index()
                 self.backtesting_results = backtesting_results.fillna('NA').to_dict('records')
                 self.backtesting_results_cols = [
@@ -850,13 +825,13 @@ class ModelCreationState(State):
                     for col in backtesting_results.columns
                 ]
                 self.optimal_params = [
-                    {'Parameter name': name, 'Optimal value': value} for name, value in model.best_params_.items()
+                    {'参数名': name, '最优值': value} for name, value in model.best_params_.items()
                 ]
                 self.optimal_params_cols = [
-                    ag_grid.column_def(field='Parameter name'),
-                    ag_grid.column_def(field='Optimal value'),
+                    ag_grid.column_def(field='参数名'),
+                    ag_grid.column_def(field='最优值'),
                 ]
-            elif self.evaluation_selection == 'Value bets':
+            elif self.evaluation_selection == '价值投注':
                 X_fix, *_ = dataloader.extract_fixtures_data()
                 value_bets = pd.DataFrame(np.round(1 / model.predict_proba(X_fix), 2), columns=model.betting_markets_)
                 value_bets = pd.concat(
@@ -883,11 +858,11 @@ class ModelCreationState(State):
         self.loading: bool = False
 
         # Mode
-        self.mode_category = 'Data'
-        self.mode_type = 'Create'
+        self.mode_category = '数据'
+        self.mode_type = '新建'
 
         # Model
-        self.model_selection = 'Odds Comparison'
+        self.model_selection = '赔率比较'
 
         # Data
         self.dataloader_serialized = None
@@ -896,7 +871,7 @@ class ModelCreationState(State):
         # Evaluation
         self.model_serialized = None
         self.model_filename = None
-        self.evaluation_selection = 'Backtesting'
+        self.evaluation_selection = '回测'
         self.backtesting_results = None
         self.backtesting_results_cols = None
         self.optimal_params = None
@@ -915,7 +890,7 @@ class ModelLoadingState(State):
     dataloader_filename: str | None = None
     model_serialized: str | None = None
     model_filename: str | None = None
-    evaluation_selection: str = 'Backtesting'
+    evaluation_selection: str = '回测'
     backtesting_results: list | None = None
     backtesting_results_cols: list | None = None
     optimal_params: list | None = None
@@ -925,7 +900,7 @@ class ModelLoadingState(State):
 
     async def on_load(self: Self) -> AsyncGenerator:
         """Event on page load."""
-        message = """Upload a dataloader and a betting model to backtest performance or identify value bets."""
+        message = """请上传数据加载器和投注模型，以执行回测或识别价值投注。"""
         self.streamed_message = ''
         for char in message:
             await asyncio.sleep(DELAY)
@@ -952,7 +927,7 @@ class ModelLoadingState(State):
         dataloader = cloudpickle.loads(bytes(cast(str, self.dataloader_serialized), 'iso8859_16'))
         if not isinstance(dataloader, BaseDataLoader):
             self.dataloader_error = True
-            message = """Uploaded file is not a dataloader. Please try again."""
+            message = """上传文件不是数据加载器，请重试。"""
             self.streamed_message = ''
             for char in message:
                 await asyncio.sleep(DELAY)
@@ -960,7 +935,7 @@ class ModelLoadingState(State):
                 yield
         else:
             self.dataloader_error = False
-            message = """Uploaded file is a dataloader. You may proceed to the next step."""
+            message = """上传文件是有效的数据加载器，可以继续下一步。"""
             self.streamed_message = ''
             for char in message:
                 await asyncio.sleep(DELAY)
@@ -981,7 +956,7 @@ class ModelLoadingState(State):
         model = cloudpickle.loads(bytes(cast(str, self.model_serialized), 'iso8859_16'))
         if not isinstance(model, BaseBettor):
             self.model_error = True
-            message = """Uploaded file is not a betting model. Please try again."""
+            message = """上传文件不是投注模型，请重试。"""
             self.streamed_message = ''
             for char in message:
                 await asyncio.sleep(DELAY)
@@ -989,7 +964,7 @@ class ModelLoadingState(State):
                 yield
         else:
             self.model_error = False
-            message = """Uploaded file is a betting model. You may proceed to the next step."""
+            message = """上传文件是有效的投注模型，可以继续下一步。"""
             self.streamed_message = ''
             for char in message:
                 await asyncio.sleep(DELAY)
@@ -1004,14 +979,13 @@ class ModelLoadingState(State):
         if self.visibility_level == VISIBILITY_LEVELS_MODEL_LOADING['dataloader_model']:
             self.loading = False
             yield
-            message = """Choose whether to backtest the model or predict value bets.<br><br>
+            message = """请选择“回测”或“价值投注”运行方式。<br><br>
 
-            Backtesting uses 3-fold time-ordered cross-validation with a constant betting
-            stake of 50 and an initial cash balance of 10000. After backtesting, the
-            model is fitted to the entire training set.<br><br>
+            回测使用 3 折时间序列交叉验证，单注固定为 50，初始资金为 10000。
+            回测结束后，模型会在全部训练集上重新拟合。<br><br>
 
-            The model can also predict value bets using the fixtures data. The model is
-            fitted to the entire training set before making predictions."""
+            价值投注模式会使用赛程数据进行预测。
+            预测前模型同样会在全部训练集上完成拟合。"""
             self.streamed_message = ''
             for char in message:
                 await asyncio.sleep(DELAY)
@@ -1030,7 +1004,7 @@ class ModelLoadingState(State):
             model.fit(X_train, Y_train, O_train)
             self.model_serialized = str(cloudpickle.dumps(model), 'iso8859_16')
             self.model_filename = 'model.pkl'
-            if self.evaluation_selection == 'Backtesting':
+            if self.evaluation_selection == '回测':
                 backtesting_results = backtest(model, X_train, Y_train, O_train, cv=TimeSeriesSplit(3)).reset_index()
                 self.backtesting_results = backtesting_results.fillna('NA').to_dict('records')
                 self.backtesting_results_cols = [
@@ -1038,13 +1012,13 @@ class ModelLoadingState(State):
                     for col in backtesting_results.columns
                 ]
                 self.optimal_params = [
-                    {'Parameter name': name, 'Optimal value': value} for name, value in model.best_params_.items()
+                    {'参数名': name, '最优值': value} for name, value in model.best_params_.items()
                 ]
                 self.optimal_params_cols = [
-                    ag_grid.column_def(field='Parameter name'),
-                    ag_grid.column_def(field='Optimal value'),
+                    ag_grid.column_def(field='参数名'),
+                    ag_grid.column_def(field='最优值'),
                 ]
-            elif self.evaluation_selection == 'Value bets':
+            elif self.evaluation_selection == '价值投注':
                 X_fix, *_ = dataloader.extract_fixtures_data()
                 value_bets = pd.DataFrame(np.round(1 / model.predict_proba(X_fix), 2), columns=model.betting_markets_)
                 value_bets = pd.concat(
@@ -1071,8 +1045,8 @@ class ModelLoadingState(State):
         self.loading: bool = False
 
         # Mode
-        self.mode_category = 'Data'
-        self.mode_type = 'Create'
+        self.mode_category = '数据'
+        self.mode_type = '新建'
 
         # Data
         self.dataloader_serialized = None
@@ -1081,7 +1055,7 @@ class ModelLoadingState(State):
         # Evaluation
         self.model_serialized = None
         self.model_filename = None
-        self.evaluation_selection = 'Backtesting'
+        self.evaluation_selection = '回测'
         self.backtesting_results = None
         self.backtesting_results_cols = None
         self.optimal_params = None

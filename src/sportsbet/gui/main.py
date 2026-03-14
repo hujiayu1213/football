@@ -15,7 +15,7 @@ def run() -> None:
         reflex_path = Path(sys.executable).parent / 'reflex'
         subprocess.run([reflex_path, 'run'], cwd=f'{Path(__file__).parent}', check=True)  # noqa: S603
     else:
-        click.echo('Node executable not found. Please install it to proceed.')
+        click.echo('未找到 Node 可执行文件，请先安装后再继续。')
 
 
 if __name__ == '__main__':

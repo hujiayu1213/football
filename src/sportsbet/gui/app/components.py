@@ -1,15 +1,15 @@
-"""Page common components."""
+"""页面公共组件。"""
 
 import reflex as rx
 from reflex_ag_grid import ag_grid
 
 
 def navbar() -> rx.Component:
-    """The navigation bar component."""
+    """导航栏组件。"""
     return rx.box(
         rx.center(
             rx.link(
-                rx.heading("Sports Betting", size="8", weight="bold", color='black'),
+                rx.heading("体育投注", size="8", weight="bold", color='black'),
                 href='https://github.com/georgedouzas/sports-betting',
                 underline='none',
                 is_external=True,
@@ -22,7 +22,7 @@ def navbar() -> rx.Component:
 
 
 def title(name: str, icon_name: str) -> rx.Component:
-    """The title component."""
+    """标题组件。"""
     return rx.hstack(
         rx.icon(icon_name),
         rx.text(name, size="4"),
@@ -31,20 +31,20 @@ def title(name: str, icon_name: str) -> rx.Component:
 
 
 def mode(state: rx.State, content: str) -> rx.Component:
-    """Mode component."""
+    """模式组件。"""
     return rx.vstack(
-        title('Mode', 'blend'),
+        title('模式', 'blend'),
         rx.text(content, size='1'),
         rx.hstack(
             rx.select(
-                items=['Data', 'Modelling'],
+                items=['数据', '建模'],
                 value=state.mode_category,
                 disabled=state.visibility_level > 1,
                 width='120px',
                 on_change=state.set_mode_category,
             ),
             rx.select(
-                ['Create', 'Load'],
+                ['新建', '加载'],
                 value=state.mode_type,
                 disabled=state.visibility_level > 1,
                 width='120px',
@@ -55,7 +55,7 @@ def mode(state: rx.State, content: str) -> rx.Component:
 
 
 def sidebar(*components: rx.Component, control: rx.Component) -> rx.Component:
-    """The sidebar component."""
+    """侧边栏组件。"""
     return rx.vstack(
         rx.vstack(*components),
         control,
@@ -69,15 +69,15 @@ def sidebar(*components: rx.Component, control: rx.Component) -> rx.Component:
 
 
 def dataloader(state: rx.State, visibility_level: int) -> rx.Component:
-    """The dataloader component."""
+    """数据加载器组件。"""
     return rx.vstack(
         rx.cond(
             state.visibility_level > visibility_level,
             rx.vstack(
-                title('Dataloader', 'database'),
+                title('数据加载器', 'database'),
                 rx.upload(
                     rx.button(
-                        'Select File',
+                        '选择文件',
                         bg='white',
                         color='rgb(107,99,246)',
                         border='1px solid rgb(107,99,246)',
@@ -96,21 +96,21 @@ def dataloader(state: rx.State, visibility_level: int) -> rx.Component:
         ),
         rx.cond(
             state.dataloader_serialized & ~state.dataloader_error,
-            rx.text(f'Dataloader: {state.dataloader_filename}', size='1'),
+            rx.text(f'数据加载器: {state.dataloader_filename}', size='1'),
         ),
     )
 
 
 def model(state: rx.State, visibility_level: int) -> rx.Component:
-    """The model component."""
+    """模型组件。"""
     return rx.vstack(
         rx.cond(
             state.visibility_level > visibility_level,
             rx.vstack(
-                title('Model', 'wand'),
+                title('模型', 'wand'),
                 rx.upload(
                     rx.button(
-                        'Select File',
+                        '选择文件',
                         bg='white',
                         color='rgb(107,99,246)',
                         border='1px solid rgb(107,99,246)',
@@ -129,13 +129,13 @@ def model(state: rx.State, visibility_level: int) -> rx.Component:
         ),
         rx.cond(
             state.model_serialized & ~state.model_error,
-            rx.text(f'Model: {state.model_filename}', size='1'),
+            rx.text(f'模型: {state.model_filename}', size='1'),
         ),
     )
 
 
 def save_dataloader(state: rx.State, visibility_level: int | None = None) -> rx.Component:
-    """The save component."""
+    """保存数据加载器按钮。"""
     return rx.button(
         rx.icon('download'),
         on_click=state.download_dataloader,
@@ -144,7 +144,7 @@ def save_dataloader(state: rx.State, visibility_level: int | None = None) -> rx.
 
 
 def save_model(state: rx.State, visibility_level: int | None = None) -> rx.Component:
-    """The save component."""
+    """保存模型按钮。"""
     return rx.button(
         rx.icon('download'),
         on_click=state.download_model,
@@ -153,7 +153,7 @@ def save_model(state: rx.State, visibility_level: int | None = None) -> rx.Compo
 
 
 def control(state: rx.State, disabled: bool, save: rx.Component, url: str | None = None) -> rx.Component:
-    """The control component."""
+    """控制区组件。"""
     return rx.vstack(
         rx.divider(),
         rx.hstack(
@@ -184,7 +184,7 @@ def control(state: rx.State, disabled: bool, save: rx.Component, url: str | None
 
 
 def dataloader_data(state: rx.State, visibility_level: int) -> rx.Component:
-    """Data component of UI."""
+    """数据显示组件。"""
     return rx.cond(
         state.visibility_level == visibility_level,
         rx.box(
@@ -208,11 +208,11 @@ def dataloader_data(state: rx.State, visibility_level: int) -> rx.Component:
                                 variant='surface',
                                 loading=state.loading_db,
                             ),
-                            content='Switch between training or fixtures data',
+                            content='在训练数据与赛程数据间切换',
                         ),
                         rx.tooltip(
                             rx.button(rx.icon('database'), variant='surface', disabled=True),
-                            content='Fixtures are not currently available',
+                            content='当前暂无赛程数据',
                         ),
                     ),
                     rx.tooltip(
@@ -222,7 +222,7 @@ def dataloader_data(state: rx.State, visibility_level: int) -> rx.Component:
                             variant='surface',
                             loading=state.loading_db,
                         ),
-                        content='Switch between input, output or odds data',
+                        content='在输入/输出/赔率数据间切换',
                     ),
                     width='100%',
                     justify='end',
@@ -235,14 +235,14 @@ def dataloader_data(state: rx.State, visibility_level: int) -> rx.Component:
 
 
 def model_data(state: rx.State, visibility_level: int) -> rx.Component:
-    """Data component of UI."""
+    """模型结果组件。"""
     return rx.cond(
         state.visibility_level == visibility_level,
         rx.box(
             rx.cond(
-                state.evaluation_selection == 'Backtesting',
+                state.evaluation_selection == '回测',
                 rx.vstack(
-                    rx.heading('Results'),
+                    rx.heading('结果'),
                     ag_grid(
                         id='backtesting',
                         row_data=state.backtesting_results,
@@ -251,7 +251,7 @@ def model_data(state: rx.State, visibility_level: int) -> rx.Component:
                         width='100%',
                         height='100%',
                     ),
-                    rx.heading('Optimal parameters'),
+                    rx.heading('最优参数'),
                     ag_grid(
                         id='parameters',
                         row_data=state.optimal_params,
@@ -263,7 +263,7 @@ def model_data(state: rx.State, visibility_level: int) -> rx.Component:
                     height='600px',
                 ),
                 rx.vstack(
-                    rx.heading('Value bets'),
+                    rx.heading('价值投注'),
                     ag_grid(
                         id='value_bets',
                         row_data=state.value_bets,
@@ -281,7 +281,7 @@ def model_data(state: rx.State, visibility_level: int) -> rx.Component:
 
 
 def bot(state: rx.State, visibility_level: int) -> rx.Component:
-    """The bot component."""
+    """机器人提示组件。"""
     return rx.cond(
         state.visibility_level < visibility_level,
         rx.box(

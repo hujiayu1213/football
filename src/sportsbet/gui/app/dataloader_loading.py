@@ -42,7 +42,7 @@ def parameters(state: rx.State) -> rx.Component:
                 rx.form.root(
                     rx.dialog.title(name),
                     rx.dialog.description(
-                        f'{name} included in the training data.',
+                        f'训练数据中包含的{name}。',
                         size="2",
                         margin_bottom="16px",
                     ),
@@ -55,14 +55,14 @@ def parameters(state: rx.State) -> rx.Component:
     return rx.cond(
         state.visibility_level > VL['dataloader'],
         rx.vstack(
-            title('Parameters', 'proportions'),
+            title('参数', 'proportions'),
             rx.hstack(
-                _dialog('Leagues', 'earth', state.all_leagues),
-                _dialog('Years', 'calendar', state.all_years),
-                _dialog('Divisions', 'gauge', state.all_divisions),
+                _dialog('联赛', 'earth', state.all_leagues),
+                _dialog('年份', 'calendar', state.all_years),
+                _dialog('级别', 'gauge', state.all_divisions),
             ),
-            rx.text(f'Odds type: {state.odds_type}', size='1'),
-            rx.text(f'Drop NA threshold of columns: {state.drop_na_thres}', size='1'),
+            rx.text(f'赔率类型: {state.odds_type}', size='1'),
+            rx.text(f'列缺失值剔除阈值: {state.drop_na_thres}', size='1'),
             margin_top='10px',
         ),
     )
@@ -75,7 +75,7 @@ def dataloader_loading_page() -> rx.Component:
         navbar(),
         rx.hstack(
             sidebar(
-                mode(DataloaderLoadingState, 'Load a dataloader'),
+                mode(DataloaderLoadingState, '加载数据加载器'),
                 dataloader(DataloaderLoadingState, 1),
                 parameters(DataloaderLoadingState),
                 control=control(

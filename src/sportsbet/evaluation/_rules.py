@@ -57,20 +57,11 @@ class OddsComparisonBettor(BaseBettor):
             The backtesting resuts.
 
     Examples:
-        >>> from sportsbet.evaluation import OddsComparisonBettor, backtest
-        >>> from sportsbet.datasets import SoccerDataLoader
-        >>> # Select only backtesting data for the Italian and Spanish leagues and years 2019 - 2022
-        >>> param_grid = {'league': ['Italy', 'Spain'], 'year': [2019, 2020, 2021, 2022]}
-        >>> dataloader = SoccerDataLoader(param_grid)
-        >>> # Select the market maximum odds
-        >>> X, Y, O = dataloader.extract_train_data(
-        ... odds_type='market_maximum',
-        ... )
-        >>> # Backtest the bettor
-        >>> bettor = OddsComparisonBettor(alpha=0.03)
-        >>> backtest(bettor, X, Y, O).reset_index()
-          Training start ... Yield percentage per bet (under_2.5__full_time_goals)
-        ...
+        Use the bettor with a dataloader and then run backtesting:
+
+        - Create a parameter grid, for example `{'league': ['Italy', 'Spain'], 'year': [2019, 2020, 2021, 2022]}`.
+        - Extract data using a dataloader with an odds type such as `market_maximum`.
+        - Create `OddsComparisonBettor(alpha=0.03)` and run backtesting with the extracted data.
     """
 
     def __init__(
@@ -88,11 +79,11 @@ class OddsComparisonBettor(BaseBettor):
     def _check_odds_types(self: Self, X: pd.DataFrame) -> Self:
         available_odds_types = {col.split('__')[1] for col in X.columns if col.startswith('odds__')}
         if not available_odds_types:
-            error_msg = 'Input data do not include any odds columns.'
+            error_msg = '输入数据未包含任何赔率列。'
             raise ValueError(error_msg)
         error_msg = (
-            'Parameter `odds_types` should be either `None` or a list of any of the odds types: '
-            f'{", ".join(sorted(available_odds_types))}. Got {self.odds_types} instead.'
+            '参数 `odds_types` 应为 `None`，或以下赔率类型之一组成的列表：'
+            f'{", ".join(sorted(available_odds_types))}。当前值为 {self.odds_types}。'
         )
         if self.odds_types is not None:
             if not isinstance(self.odds_types, list) or any(

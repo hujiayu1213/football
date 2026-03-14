@@ -30,7 +30,7 @@ from ._utils import (
 
 @click.group()
 def bettor() -> None:
-    """Backtest a bettor and predict the value bets."""
+    """对投注器进行回测并预测价值投注。"""
     return
 
 
@@ -38,7 +38,7 @@ def bettor() -> None:
 @get_config_path_option()
 @get_data_path_option()
 def backtest(config_path: str, data_path: str) -> None:
-    """Apply backtesting to the bettor."""
+    """对投注器执行回测。"""
     mod = get_module(config_path)
     dataloader_cls = get_dataloader_cls(mod)
     if dataloader_cls is None:
@@ -54,7 +54,7 @@ def backtest(config_path: str, data_path: str) -> None:
     if O_train is None:
         console = Console()
         warning = Panel.fit(
-            '[bold red]Dataloader does not support odds data. Backtesting of bettor is not possible.',
+            '[bold red]数据加载器不支持赔率数据，无法对投注器进行回测。',
         )
         console.print(warning)
         return
@@ -68,7 +68,7 @@ def backtest(config_path: str, data_path: str) -> None:
         verbose=get_verbose(mod),
     )
     if mod is not None:
-        print_console([backtesting_results], ['Backtesting results'])
+        print_console([backtesting_results], ['回测结果'])
         if data_path is not None:
             (Path(data_path) / 'sports-betting-data').mkdir(parents=True, exist_ok=True)
             backtesting_results.to_csv(Path(data_path) / 'sports-betting-data' / 'backtesting_results.csv')
@@ -78,7 +78,7 @@ def backtest(config_path: str, data_path: str) -> None:
 @get_config_path_option()
 @get_data_path_option()
 def bet(config_path: str, data_path: str) -> None:
-    """Get value bets."""
+    """获取价值投注。"""
     mod = get_module(config_path)
     dataloader_cls = get_dataloader_cls(mod)
     if dataloader_cls is None:
@@ -96,14 +96,14 @@ def bet(config_path: str, data_path: str) -> None:
     if O_fix is None or (X_fix.empty and O_fix is not None and O_fix.empty):
         console = Console()
         warning = Panel.fit(
-            '[bold red]Fixtures data were empty.',
+            '[bold red]赛程数据为空。',
         )
         console.print(warning)
         return
     bettor.fit(X_train, Y_train)
     value_bets = bettor.bet(X_fix, O_fix)
     if mod is not None:
-        print_console([value_bets], ['Value bets'])
+        print_console([value_bets], ['价值投注'])
         if data_path is not None:
             (Path(data_path) / 'sports-betting-data').mkdir(parents=True, exist_ok=True)
             columns = [col.split('__')[2] for col in O_fix.columns]

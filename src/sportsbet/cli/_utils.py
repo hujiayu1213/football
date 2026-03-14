@@ -24,7 +24,7 @@ def get_module(config_path: str) -> ModuleType | None:
     console = Console()
     if not Path(config_path).exists():
         warning = Panel.fit(
-            '[bold red]Path of configuration file does not exist.',
+            '[bold red]配置文件路径不存在。',
         )
         console.print(warning)
         return None
@@ -36,7 +36,7 @@ def get_module(config_path: str) -> ModuleType | None:
             return mod
     else:
         warning = Panel.fit(
-            '[bold red]Configuration file does not have the expected content.',
+            '[bold red]配置文件内容不符合预期。',
         )
         console.print(warning)
     return None
@@ -49,13 +49,13 @@ def get_dataloader_cls(mod: ModuleType | None) -> type[BaseDataLoader] | None:
         return None
     if not hasattr(mod, 'DATALOADER_CLASS'):
         warning = Panel.fit(
-            '[bold red]Configuration file does not have a `DATALOADER_CLASS` variable.',
+            '[bold red]配置文件缺少 `DATALOADER_CLASS` 变量。',
         )
         console.print(warning)
         return None
     elif not issubclass(mod.DATALOADER_CLASS, BaseDataLoader):
         warning = Panel.fit(
-            '[bold red]`DATALOADER_CLASS` variable should be a `\'dataloader\'` class.',
+            '[bold red]`DATALOADER_CLASS` 变量应为 `dataloader` 类。',
         )
         console.print(warning)
         return None
@@ -88,19 +88,19 @@ def get_bettor(mod: ModuleType | None) -> BaseBettor | None:
         return None
     if not hasattr(mod, 'BETTOR'):
         warning = Panel.fit(
-            '[bold red]Configuration file does not have a `BETTOR` variable.',
+            '[bold red]配置文件缺少 `BETTOR` 变量。',
         )
         console.print(warning)
         return None
     elif not hasattr(mod, 'DATALOADER_CLASS'):
         warning = Panel.fit(
-            '[bold red]Configuration file does not have a `DATALOADER_CLASS` variable.',
+            '[bold red]配置文件缺少 `DATALOADER_CLASS` 变量。',
         )
         console.print(warning)
         return None
     elif not isinstance(mod.BETTOR, BaseBettor):
         warning = Panel.fit(
-            '[bold red]`BETTOR` variable should be a `\'bettor\'` object.',
+            '[bold red]`BETTOR` 变量应为 `bettor` 对象。',
         )
         console.print(warning)
         return None
